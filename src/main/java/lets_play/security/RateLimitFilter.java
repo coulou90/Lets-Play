@@ -32,29 +32,38 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+protected void doFilterInternal(HttpServletRequest request,
+                                HttpServletResponse response,
+                                FilterChain filterChain)
+        throws ServletException, IOException {
 
-        String ip = request.getRemoteAddr();
-        String path = request.getRequestURI();
-        boolean isLoginEndpoint = path.contains("/api/auth/login");
+    String ip = request.getRemoteAddr();
+    String path = request.getRequestURI();
 
-        Bucket bucket = isLoginEndpoint
-                ? authBuckets.computeIfAbsent(ip, k -> createAuthBucket())
-                : apiBuckets.computeIfAbsent(ip, k -> createApiBucket());
-
-        if (bucket.tryConsume(1)) {
-            filterChain.doFilter(request, response);
-        } else {
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            String message = isLoginEndpoint
-                    ? "{\"status\":429,\"message\":\"Trop de tentatives de connexion. Reessayez dans une minute.\"}"
-                    : "{\"status\":429,\"message\":\"Trop de requetes. Reessayez dans une minute.\"}";
-            response.getWriter().write(message);
-        }
+    // Exclure Swagger du rate limiting
+    if (path.contains("/swagger-ui") || 
+        path.contains("/api-docs") || 
+        path.contains("/swagger-resources")) {
+        filterChain.doFilter(request, response);
+        return;
     }
+
+    boolean isLoginEndpoint = path.contains("/api/auth/login");
+
+    Bucket bucket = isLoginEndpoint
+            ? authBuckets.computeIfAbsent(ip, k -> createAuthBucket())
+            : apiBuckets.computeIfAbsent(ip, k -> createApiBucket());
+
+    if (bucket.tryConsume(1)) {
+        filterChain.doFilter(request, response);
+    } else {
+        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String message = isLoginEndpoint
+                ? "{\"status\":429,\"message\":\"Trop de tentatives de connexion. Reessayez dans une minute.\"}"
+                : "{\"status\":429,\"message\":\"Trop de requetes. Reessayez dans une minute.\"}";
+        response.getWriter().write(message);
+    }
+}
 }

@@ -1,5 +1,8 @@
 package lets_play.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lets_play.exception.ResourceNotFoundException;
 import lets_play.model.Product;
 import lets_play.repository.UserRepository;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Produits", description = "Gestion des produits")
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -22,16 +26,20 @@ public class ProductController {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
+    @Operation(summary = "Liste tous les produits", description = "Public - aucune authentification requise")
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
+    @Operation(summary = "Recuperer un produit", description = "Public - aucune authentification requise")
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable String id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
+    @Operation(summary = "Creer un produit", description = "Authentifie uniquement")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping
     public ResponseEntity<Product> createProduct(
             @RequestBody Product product,
@@ -47,6 +55,8 @@ public class ProductController {
                 .body(productService.createProduct(product, userId));
     }
 
+    @Operation(summary = "Modifier un produit", description = "Proprietaire ou Admin uniquement")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable String id,
@@ -63,6 +73,8 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, product, userId, role));
     }
 
+    @Operation(summary = "Supprimer un produit", description = "Proprietaire ou Admin uniquement")
+    @SecurityRequirement(name = "Bearer Authentication")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(
             @PathVariable String id,

@@ -1,5 +1,7 @@
 package lets_play.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lets_play.dto.LoginRequest;
 import lets_play.dto.RegisterRequest;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "Authentification", description = "Register et Login")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    @Operation(summary = "Creer un compte", description = "Enregistre un nouvel utilisateur")
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
 
@@ -43,6 +47,7 @@ public class AuthController {
                 .body(Map.of("message", "Compte cree avec succes"));
     }
 
+    @Operation(summary = "Se connecter", description = "Retourne un token JWT")
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
 
