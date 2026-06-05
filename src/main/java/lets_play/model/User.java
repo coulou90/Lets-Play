@@ -44,7 +44,7 @@ public class User {
     @JsonIgnore // Indique à Jackson de ne JAMAIS inclure ce champ dans la sérialisation JSON
                 // Le hash BCrypt ne transitera donc jamais dans une réponse HTTP
                 // même si un endpoint retourne directement un objet User par erreur
-                // ⚠️ Défense en profondeur : UserResponse offre une protection similaire
+                // Défense en profondeur : UserResponse offre une protection similaire
                 //    mais @JsonIgnore protège même sans passer par le DTO
     private String password;
 

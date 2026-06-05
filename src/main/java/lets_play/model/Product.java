@@ -34,7 +34,7 @@ public class Product {
     private String description; // Description détaillée du produit
 
     private Double price;       // Prix du produit en Double pour supporter les décimales (ex: 69.99)
-                                // ⚠️ En production, préférer BigDecimal pour éviter
+                                //  En production, préférer BigDecimal pour éviter
                                 // les erreurs d'arrondi sur les calculs financiers
 
     private String userId;      // Référence vers l'id du propriétaire dans la collection "users"

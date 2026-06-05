@@ -20,7 +20,7 @@ public class LoginRequest {
     private String email;
 
     @NotBlank(message = "Le mot de passe est obligatoire") // Refuse null, "" et les chaînes vides/espaces
-    // ⚠️ Pas de contrainte de longueur ou de complexité ici : la validation métier du mot de passe
+    //  Pas de contrainte de longueur ou de complexité ici : la validation métier du mot de passe
     // n'a pas de sens au login (on vérifie juste que le champ n'est pas vide avant de comparer avec le hash BCrypt)
     private String password;
 }
